@@ -1,14 +1,30 @@
-import express from 'express'
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from 'dotenv';
+import userRouter from "./routes/userRoutes.js";
+import productRouter from "./routes/productRoutes.js";
+import orderRouter from "./routes/orderRoutes.js";
+
+dotenv.config();
+
 const app = express();
-app.listen(8080,()=>{
-    console.log("Server started");
-});
-app.get("/", (req, res)=>{
-    return res.send("Good morning");
-});
-app.get("/greet", (req, res)=>{
-     res.send("good evening");
-});
-app.get("/name", (req, res)=>{
-     res.send("ashwitha");
-});
+app.use(cors());
+app.use(express.json());
+
+const MONGODB_URI = process.env.MONGODB_URI
+
+app.use("/users", userRouter);
+app.use("/products", productRouter);
+app.use("/orders",orderRouter)
+
+mongoose
+  .connect(MONGODB_URI)
+  .then(() => {
+    app.listen(8080, () => {
+      console.log("Server Started on port 8080");
+    });
+  })
+  .catch((error) => {
+    console.log(error);
+  });
